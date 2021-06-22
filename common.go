@@ -12,7 +12,7 @@ type Request struct {
 
 type Response struct {
 	Success   bool   `json:"success"`
-	ErrorCode string `json:"errorCode"`
+	ErrorCode int64  `json:"errorCode"`
 	Message   string `json:"message"`
 }
 

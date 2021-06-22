@@ -31,7 +31,7 @@ func (a *APIClient) Balances() (map[string]*BalanceResponse, error) {
 	}
 
 	if !resp.Response.Success {
-		return nil, fmt.Errorf("API ERROR %v: %v", resp.ErrorCode, resp.Message)
+		return nil, fmt.Errorf("API ERROR %d: %v", resp.ErrorCode, resp.Message)
 	}
 
 	return resp.Result, nil

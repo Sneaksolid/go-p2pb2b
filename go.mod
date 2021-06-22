@@ -1,3 +1,3 @@
-module go-p2pb2b
+module github.com/Sneaksolid/go-p2pb2b
 
 go 1.16

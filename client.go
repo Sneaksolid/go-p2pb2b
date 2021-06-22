@@ -1,4 +1,4 @@
-package go_p2pb2b
+package p2pb2b
 
 import (
 	"errors"

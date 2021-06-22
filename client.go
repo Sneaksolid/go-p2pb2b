@@ -59,7 +59,7 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	if err != nil {
 		return nil, err
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	return ioutil.ReadAll(resp.Body)
 }

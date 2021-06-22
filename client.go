@@ -49,12 +49,7 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	payload := base64.StdEncoding.EncodeToString(b)
 	h := hmac.New(sha256.New, []byte(a.apiSecret))
 	h.Write([]byte(payload))
-	signatureHex := string(h.Sum(nil))
-	signatureBytes, err := hex.DecodeString(signatureHex)
-	if err != nil {
-		return nil, err
-	}
-	signature := string(signatureBytes)
+	signature := hex.EncodeToString(h.Sum(nil))
 
 	req.Header.Add(API_KEY_HEADER, a.apiKey)
 	req.Header.Add(API_PAYLOAD_HEADER, payload)

@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -48,7 +49,12 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	payload := base64.StdEncoding.EncodeToString(b)
 	h := hmac.New(sha256.New, []byte(a.apiSecret))
 	h.Write([]byte(payload))
-	signature := string(h.Sum(nil))
+	signatureHex := string(h.Sum(nil))
+	signatureBytes, err := hex.DecodeString(signatureHex)
+	if err != nil {
+		return nil, err
+	}
+	signature := string(signatureBytes)
 
 	req.Header.Add(API_KEY_HEADER, a.apiKey)
 	req.Header.Add(API_PAYLOAD_HEADER, payload)

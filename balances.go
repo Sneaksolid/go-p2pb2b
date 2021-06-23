@@ -2,7 +2,6 @@ package p2pb2b
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 const BALANCES_ENDPOINT = "/api/v2/account/balances"
@@ -28,10 +27,6 @@ func (a *APIClient) Balances() (map[string]*BalanceResponse, error) {
 	err = json.Unmarshal(b, &resp)
 	if err != nil {
 		return nil, err
-	}
-
-	if !resp.Response.Success {
-		return nil, fmt.Errorf("API ERROR %d: %v", resp.ErrorCode, resp.Message)
 	}
 
 	return resp.Result, nil

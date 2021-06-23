@@ -67,6 +67,16 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 		return nil, err
 	}
 
+	r := new(Response)
+	err = json.Unmarshal(respBytes, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	if !r.Success {
+		return nil, fmt.Errorf("API ERROR %d: %v", r.ErrorCode, r.Message)
+	}
+
 	if Debug {
 		log.Println(string(respBytes))
 	}

@@ -75,12 +75,17 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 		return nil, err
 	}
 
-	if !r.Success {
-		return nil, fmt.Errorf("API ERROR %d: %v", r.ErrorCode.(int64), r.Message)
-	}
-
 	if Debug {
 		log.Println(string(respBytes))
+	}
+
+	if !r.Success {
+		if val, ok := r.ErrorCode.(int64); ok {
+			return nil, fmt.Errorf("API ERROR %d: %v", val, r.Message)
+		} else {
+
+			return nil, fmt.Errorf("API ERROR %v: %v", r.ErrorCode, r.Message)
+		}
 	}
 
 	return respBytes, nil

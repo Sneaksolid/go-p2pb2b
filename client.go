@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -61,5 +62,14 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	}
 	defer resp.Body.Close()
 
-	return ioutil.ReadAll(resp.Body)
+	respBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if Debug {
+		log.Println(string(respBytes))
+	}
+
+	return respBytes, nil
 }

@@ -1,5 +1,7 @@
 package p2pb2b
 
+var Debug = false
+
 type APIRequest interface {
 	SetRequest(request string)
 	SetNonce(nonce int64)

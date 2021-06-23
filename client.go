@@ -32,6 +32,17 @@ func NewClient(apikey, apiSecret string) *APIClient {
 	}
 }
 
+func (a *APIClient) requestPublic(endpoint string) ([]byte, error) {
+	url := fmt.Sprintf("%v%v", API_URL, endpoint)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add(API_CONTENT_TYPE, "application/json")
+	return a.doRequest(req)
+}
+
 func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error) {
 	request.SetRequest(endpoint)
 	request.SetNonce(time.Now().Unix())
@@ -58,6 +69,10 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	req.Header.Add(API_SIGNATURE_HEADER, signature)
 	req.Header.Add(API_CONTENT_TYPE, "application/json")
 
+	return a.doRequest(req)
+}
+
+func (a *APIClient) doRequest(req *http.Request) ([]byte, error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err

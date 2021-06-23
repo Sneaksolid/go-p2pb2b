@@ -76,7 +76,7 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	}
 
 	if !r.Success {
-		return nil, fmt.Errorf("API ERROR %d: %v", r.ErrorCode, r.Message)
+		return nil, fmt.Errorf("API ERROR %d: %v", r.ErrorCode.(int64), r.Message)
 	}
 
 	if Debug {

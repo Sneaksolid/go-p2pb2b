@@ -13,9 +13,10 @@ type Request struct {
 }
 
 type Response struct {
-	Success   bool   `json:"success"`
-	ErrorCode int64  `json:"errorCode"`
-	Message   string `json:"message"`
+	Success bool `json:"success"`
+	// Needs to be an interface because the api can't decide on a type
+	ErrorCode interface{} `json:"errorCode"`
+	Message   string      `json:"message"`
 }
 
 func (r *Request) SetRequest(request string) {

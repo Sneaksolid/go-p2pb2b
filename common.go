@@ -26,3 +26,19 @@ func (r *Request) SetRequest(request string) {
 func (r *Request) SetNonce(nonce int64) {
 	r.Nonce = nonce
 }
+
+type Order struct {
+	OrderId   int64   `json:"orderId"`
+	Market    string  `json:"market"`
+	Price     string  `json:"price"`
+	Side      string  `json:"side"`
+	Type      string  `json:"type"`
+	Timestamp float64 `json:"timestamp"`
+	DealMoney string  `json:"dealMoney"`
+	DealStock string  `json:"dealStock"`
+	Amount    string  `json:"amount"`
+	TakerFee  string  `json:"takerFee"`
+	MakerFee  string  `json:"makerFee"`
+	Left      string  `json:"left"`
+	DealFee   string  `json:"dealFee"`
+}

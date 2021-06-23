@@ -6,7 +6,7 @@ const CREATE_ORDER_ENDPOINT = "/api/v2/order/new"
 
 type createOrderResponse struct {
 	Response
-	Result *CreateOrderResponse
+	Result *Order
 }
 
 type CreateOrderRequest struct {
@@ -17,23 +17,7 @@ type CreateOrderRequest struct {
 	Price  string `json:"price"`
 }
 
-type CreateOrderResponse struct {
-	OrderId   int64   `json:"orderId"`
-	Market    string  `json:"market"`
-	Price     string  `json:"price"`
-	Side      string  `json:"side"`
-	Type      string  `json:"type"`
-	Timestamp float64 `json:"timestamp"`
-	DealMoney string  `json:"dealMoney"`
-	DealStock string  `json:"dealStock"`
-	Amount    string  `json:"amount"`
-	TakerFee  string  `json:"takerFee"`
-	MakerFee  string  `json:"makerFee"`
-	Left      string  `json:"left"`
-	DealFee   string  `json:"dealFee"`
-}
-
-func (a *APIClient) CreateOrder(orderRequest *CreateOrderRequest) (*CreateOrderResponse, error) {
+func (a *APIClient) CreateOrder(orderRequest *CreateOrderRequest) (*Order, error) {
 	b, err := a.request(CREATE_ORDER_ENDPOINT, orderRequest)
 	if err != nil {
 		return nil, err

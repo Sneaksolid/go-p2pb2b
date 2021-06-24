@@ -43,6 +43,23 @@ func (a *APIClient) requestPublic(endpoint string) ([]byte, error) {
 	return a.doRequest(req)
 }
 
+func (a *APIClient) requestPublicParams(endpoint string, params map[string]string) ([]byte, error) {
+	url := fmt.Sprintf("%v%v", API_URL, endpoint)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	query := req.URL.Query()
+	for key, val := range params {
+		query.Add(key, val)
+	}
+
+	req.URL.RawQuery = query.Encode()
+	req.Header.Add(API_CONTENT_TYPE, "application/json")
+	return a.doRequest(req)
+}
+
 func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error) {
 	request.SetRequest(endpoint)
 	request.SetNonce(time.Now().Unix())

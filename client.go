@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,6 +31,10 @@ func NewClient(apikey, apiSecret string) *APIClient {
 		apiKey:    apikey,
 		apiSecret: apiSecret,
 	}
+}
+
+func NewPublicClient() *APIClient {
+	return &APIClient{}
 }
 
 func (a *APIClient) requestPublic(endpoint string) ([]byte, error) {
@@ -61,6 +66,10 @@ func (a *APIClient) requestPublicParams(endpoint string, params map[string]strin
 }
 
 func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error) {
+	if a.apiKey == "" || a.apiSecret == "" {
+		return nil, errors.New("missing credentials")
+	}
+
 	request.SetRequest(endpoint)
 	request.SetNonce(time.Now().Unix())
 

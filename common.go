@@ -1,5 +1,10 @@
 package p2pb2b
 
+import (
+	"sort"
+	"strconv"
+)
+
 var Debug = false
 
 type APIRequest interface {
@@ -43,6 +48,21 @@ type Order struct {
 	DealFee   string  `json:"dealFee"`
 }
 
+type OrderBookEntry struct {
+	Id        int64   `json:"id"`
+	Left      string  `json:"left"`
+	Market    string  `json:"market"`
+	Amount    string  `json:"amount"`
+	Type      string  `json:"type"`
+	Price     string  `json:"price"`
+	Timestamp float64 `json:"timestamp"`
+	Side      string  `json:"side"`
+	TakerFee  string  `json:"takerFee"`
+	MakerFee  string  `json:"makerFee"`
+	DealStock string  `json:"dealStock"`
+	DealMoney string  `json:"dealMoney"`
+}
+
 type Precision struct {
 	Money string `json:"money"`
 	Stock string `json:"stock"`
@@ -65,4 +85,72 @@ type Market struct {
 	Money     string     `json:"money"`
 	Precision *Precision `json:"precision"`
 	Limits    *Limits    `json:"limits"`
+}
+
+type SimpleOrderBookEntry struct {
+	Price  string
+	Amount string
+}
+
+type SimpleOrderBook struct {
+	Asks []*SimpleOrderBookEntry
+	Bids []*SimpleOrderBookEntry
+}
+
+type orderBook []*OrderBookEntry
+
+func (o orderBook) Len() int {
+	return len(o)
+}
+
+func (o orderBook) Less(i, j int) bool {
+	iNum, err := strconv.ParseFloat(o[i].Price, 64)
+	if err != nil {
+		return false
+	}
+
+	jNum, err := strconv.ParseFloat(o[i].Price, 64)
+	if err != nil {
+		return false
+	}
+
+	return iNum > jNum
+}
+
+func (o orderBook) Swap(i, j int) {
+	o[i], o[j] = o[j], o[i]
+}
+
+// Function only our company needs
+func GetSimpleOrderBook(buyBooks []*OrderBookEntry, sellBooks []*OrderBookEntry) *SimpleOrderBook {
+	sellCpy := make([]*OrderBookEntry, len(sellBooks))
+	buyCpy := make([]*OrderBookEntry, len(buyBooks))
+	copy(sellCpy, sellBooks)
+	copy(buyCpy, buyBooks)
+
+	sort.Sort(orderBook(sellCpy))
+	sort.Sort(orderBook(buyCpy))
+
+	asks := make([]*SimpleOrderBookEntry, len(sellCpy))
+	for i, val := range sellCpy {
+		asks[i] = &SimpleOrderBookEntry{
+			Price:  val.Price,
+			Amount: val.Amount,
+		}
+	}
+
+	bids := make([]*SimpleOrderBookEntry, len(buyCpy))
+	for i, val := range buyCpy {
+		bids[i] = &SimpleOrderBookEntry{
+			Price:  val.Price,
+			Amount: val.Amount,
+		}
+	}
+
+	result := &SimpleOrderBook{
+		Asks: asks,
+		Bids: bids,
+	}
+
+	return result
 }

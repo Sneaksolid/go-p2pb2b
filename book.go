@@ -9,10 +9,17 @@ const BOOK_ENDPOINT = "/api/v2/public/book"
 
 type bookResponse struct {
 	Response
-	Result []*OrderBookEntry
+	Result *OrderBookResponse
 }
 
-func (a *APIClient) Book(market string, side string, offset *int, limit *int) ([]*OrderBookEntry, error) {
+type OrderBookResponse struct {
+	Offset int               `json:"offset"`
+	Limit  int               `json:"limit"`
+	Total  int               `json:"total"`
+	Orders []*OrderBookEntry `json:"orders"`
+}
+
+func (a *APIClient) Book(market string, side string, offset *int, limit *int) (*OrderBookResponse, error) {
 	params := make(map[string]string)
 	params["market"] = market
 	params["side"] = side
@@ -33,5 +40,5 @@ func (a *APIClient) Book(market string, side string, offset *int, limit *int) ([
 	if err != nil {
 		return nil, err
 	}
-	return nil, err
+	return resp.Result, nil
 }

@@ -128,8 +128,8 @@ func GetSimpleOrderBook(buyBooks []*OrderBookEntry, sellBooks []*OrderBookEntry)
 	copy(sellCpy, sellBooks)
 	copy(buyCpy, buyBooks)
 
-	sort.Sort(orderBook(sellCpy))
 	sort.Sort(orderBook(buyCpy))
+	sort.Sort(sort.Reverse(orderBook(sellCpy)))
 
 	asks := make([]*SimpleOrderBookEntry, len(sellCpy))
 	for i, val := range sellCpy {

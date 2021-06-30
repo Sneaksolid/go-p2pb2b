@@ -48,6 +48,17 @@ type Order struct {
 	DealFee   string  `json:"dealFee"`
 }
 
+type OrderDeal struct {
+	Id          int64   `json:"id"`
+	DealOrderId int64   `json:"dealOrderId"`
+	Time        float64 `json:"timestamp"`
+	Fee         string  `json:"fee"`
+	Price       string  `json:"price"`
+	Amount      string  `json:"amount"`
+	Role        int     `json:"role"`
+	Deal        string  `json:"deal"`
+}
+
 type OrderBookEntry struct {
 	Id        int64   `json:"id"`
 	Left      string  `json:"left"`

@@ -71,7 +71,7 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 	}
 
 	request.SetRequest(endpoint)
-	request.SetNonce(time.Now().Unix())
+	request.SetNonce(time.Now().UnixNano())
 
 	b, err := json.Marshal(request)
 	if err != nil {

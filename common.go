@@ -51,7 +51,7 @@ type Order struct {
 type OrderDeal struct {
 	Id          int64   `json:"id"`
 	DealOrderId int64   `json:"dealOrderId"`
-	Time        float64 `json:"timestamp"`
+	Time        float64 `json:"time"`
 	Fee         string  `json:"fee"`
 	Price       string  `json:"price"`
 	Amount      string  `json:"amount"`

@@ -105,6 +105,16 @@ func (a *APIClient) doRequest(req *http.Request) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		if Debug {
+			respBytes, err := ioutil.ReadAll(resp.Body)
+			if err == nil {
+				log.Printf("API RESPONSE: %v\n", string(respBytes))
+			}
+		}
+		return nil, fmt.Errorf("API ERROR: Exchange returned %d status", resp.StatusCode)
+	}
+
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

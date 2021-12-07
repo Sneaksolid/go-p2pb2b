@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -99,23 +100,25 @@ func (a *APIClient) request(endpoint string, request APIRequest) ([]byte, error)
 }
 
 func (a *APIClient) doRequest(req *http.Request) ([]byte, error) {
+	var debugReqBytes []byte
+	var err error
+
+	if Debug {
+		debugReqBytes, err = ioutil.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+		req.Body.Close()
+
+		newBody := bytes.NewReader(debugReqBytes)
+		req.Body = io.NopCloser(newBody)
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	/*
-		if resp.StatusCode != 200 {
-			if Debug {
-				respBytes, err := ioutil.ReadAll(resp.Body)
-				if err == nil {
-					log.Printf("API RESPONSE: %v\n", string(respBytes))
-				}
-			}
-			return nil, fmt.Errorf("API ERROR: Exchange returned %d status", resp.StatusCode)
-		}
-	*/
 
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -129,7 +132,7 @@ func (a *APIClient) doRequest(req *http.Request) ([]byte, error) {
 	}
 
 	if Debug {
-		log.Println(string(respBytes))
+		log.Printf("P2PB2B Request: (%v), Response: (%v)", string(debugReqBytes), string(respBytes))
 	}
 
 	if !r.Success {

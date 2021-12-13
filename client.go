@@ -103,7 +103,7 @@ func (a *APIClient) doRequest(req *http.Request) ([]byte, error) {
 	var debugReqBytes []byte
 	var err error
 
-	if Debug {
+	if Debug && req.Body != nil {
 		debugReqBytes, err = ioutil.ReadAll(req.Body)
 		if err != nil {
 			return nil, err

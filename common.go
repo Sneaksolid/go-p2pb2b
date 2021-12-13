@@ -1,6 +1,7 @@
 package p2pb2b
 
 import (
+	"encoding/json"
 	"sort"
 	"strconv"
 )
@@ -30,6 +31,51 @@ func (r *Request) SetRequest(request string) {
 
 func (r *Request) SetNonce(nonce int64) {
 	r.Nonce = nonce
+}
+
+type PaginationFunc func(offset int, limit int) ([]byte, error)
+
+type dummyPagnitationResponse struct {
+	Response
+	Result *PaginatedResponse
+}
+
+type PaginatedResponse struct {
+	paginationFunc PaginationFunc `json:"-"`
+	current        int            `json:"-"`
+
+	Offset  int           `json:"offset"`
+	Limit   int           `json:"limit"`
+	Records []interface{} `json:"records"`
+}
+
+func (p *PaginatedResponse) Next() (interface{}, error, bool) {
+	if p.current >= p.Limit && p.paginationFunc != nil {
+		// refetch
+		b, err := p.paginationFunc(p.Offset+p.Limit, p.Limit)
+		if err != nil {
+			return nil, err, false
+		}
+
+		dummy := dummyPagnitationResponse{
+			Result: p,
+		}
+		err = json.Unmarshal(b, &dummy)
+		if err != nil {
+			return nil, err, false
+		}
+
+		p.current = 0
+	}
+
+	if p.current >= len(p.Records) {
+		return nil, nil, false
+	}
+
+	res := p.Records[p.current]
+	p.current += 1
+
+	return res, nil, true
 }
 
 type Order struct {

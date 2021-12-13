@@ -10,9 +10,19 @@ type orderResponse struct {
 }
 
 type OrderResponse struct {
-	Offset  int          `json:"offset"`
-	Limit   int          `json:"limit"`
-	Records []*OrderDeal `json:"records"`
+	PaginatedResponse
+}
+
+func (o *OrderResponse) Next() (*OrderDeal, error, bool) {
+	res, err, ok := o.PaginatedResponse.Next()
+	if !ok || err != nil {
+		return nil, err, ok
+	}
+
+	b, _ := json.Marshal(res)
+	deal := new(OrderDeal)
+	err = json.Unmarshal(b, deal)
+	return deal, err, ok
 }
 
 type OrderRequest struct {
@@ -32,6 +42,13 @@ func (a *APIClient) Order(orderRequest *OrderRequest) (*OrderResponse, error) {
 	err = json.Unmarshal(b, &resp)
 	if err != nil {
 		return nil, err
+	}
+
+	resp.Result.paginationFunc = func(offset int, limit int) ([]byte, error) {
+		orderRequest.Offset = offset
+		orderRequest.Limit = limit
+
+		return a.request(ORDER_ENDPOINT, orderRequest)
 	}
 
 	return resp.Result, nil

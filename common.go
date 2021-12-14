@@ -2,6 +2,7 @@ package p2pb2b
 
 import (
 	"encoding/json"
+	"errors"
 	"sort"
 	"strconv"
 )
@@ -76,6 +77,34 @@ func (p *PaginatedResponse) Next() (interface{}, error, bool) {
 	p.current += 1
 
 	return res, nil, true
+}
+
+func (p *PaginatedResponse) UnmarshalJSON(data []byte) error {
+	var tmp interface{}
+	err := json.Unmarshal(data, &tmp)
+	if err != nil {
+		return err
+	}
+
+	_, ok := tmp.(map[string]interface{})
+	if ok {
+		return json.Unmarshal(data, p)
+	}
+
+	tmpArray, ok := tmp.([]interface{})
+	if !ok {
+		return errors.New("response is neither a struct nor an array")
+	}
+
+	if p.Offset == 0 && p.Limit == 0 {
+		// init pagination params. should only happen on first unmarshal
+		p.Limit = len(tmpArray)
+	} else {
+		p.Offset = p.Offset + p.Limit
+	}
+
+	p.Records = tmpArray
+	return nil
 }
 
 type Order struct {

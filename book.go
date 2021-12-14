@@ -13,19 +13,10 @@ type bookResponse struct {
 }
 
 type OrderBookResponse struct {
-	PaginatedResponse
-}
-
-func (o *OrderBookResponse) Next() (*OrderBookEntry, error, bool) {
-	res, err, ok := o.PaginatedResponse.Next()
-	if !ok || err != nil {
-		return nil, err, ok
-	}
-
-	b, _ := json.Marshal(res)
-	entry := new(OrderBookEntry)
-	err = json.Unmarshal(b, entry)
-	return entry, err, ok
+	Offset int               `json:"offset"`
+	Limit  int               `json:"limit"`
+	Total  int               `json:"total"`
+	Orders []*OrderBookEntry `json:"orders"`
 }
 
 func (a *APIClient) Book(market string, side string, offset *int, limit *int) (*OrderBookResponse, error) {
@@ -48,15 +39,6 @@ func (a *APIClient) Book(market string, side string, offset *int, limit *int) (*
 	err = json.Unmarshal(b, &resp)
 	if err != nil {
 		return nil, err
-	}
-
-	if offset == nil && limit == nil {
-		resp.Result.paginationFunc = func(offset int, limit int) ([]byte, error) {
-			params["offset"] = strconv.Itoa(offset)
-			params["limit"] = strconv.Itoa(limit)
-
-			return a.requestPublicParams(BOOK_ENDPOINT, params)
-		}
 	}
 
 	return resp.Result, nil

@@ -44,6 +44,7 @@ type dummyPagnitationResponse struct {
 type PaginatedResponse struct {
 	paginationFunc PaginationFunc `json:"-"`
 	current        int            `json:"-"`
+	refetch        bool           `json:"-"`
 
 	Offset  int           `json:"offset"`
 	Limit   int           `json:"limit"`
@@ -52,6 +53,7 @@ type PaginatedResponse struct {
 
 func (p *PaginatedResponse) Next() (interface{}, error, bool) {
 	if p.current >= p.Limit && p.paginationFunc != nil {
+		p.refetch = true
 		// refetch
 		b, err := p.paginationFunc(p.Offset+p.Limit, p.Limit)
 		if err != nil {
@@ -86,9 +88,28 @@ func (p *PaginatedResponse) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	_, ok := tmp.(map[string]interface{})
+	tmpMap, ok := tmp.(map[string]interface{})
 	if ok {
-		return json.Unmarshal(data, p)
+		offset, ok := tmpMap["offset"].(float64)
+		if !ok {
+			return errors.New("response has no field offset")
+		}
+
+		limit, ok := tmpMap["limit"].(float64)
+		if !ok {
+			return errors.New("response has no field offset")
+		}
+
+		records, ok := tmpMap["records"].([]interface{})
+		if !ok {
+			return errors.New("response has no field records")
+		}
+
+		p.Offset = int(offset)
+		p.Limit = int(limit)
+		p.Records = records
+
+		return nil
 	}
 
 	tmpArray, ok := tmp.([]interface{})
@@ -98,8 +119,12 @@ func (p *PaginatedResponse) UnmarshalJSON(data []byte) error {
 
 	if p.Offset == 0 && p.Limit == 0 {
 		// init pagination params. should only happen on first unmarshal
-		p.Limit = len(tmpArray)
-	} else {
+		if len(tmpArray) == 0 {
+			p.Limit = 1
+		} else {
+			p.Limit = len(tmpArray)
+		}
+	} else if p.refetch {
 		p.Offset = p.Offset + p.Limit
 	}
 

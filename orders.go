@@ -39,6 +39,10 @@ func (a *APIClient) Orders(ordersRequest *OrdersRequest) (*OrdersResponse, error
 	}
 
 	resp := new(ordersResponse)
+	resp.Result = new(OrdersResponse)
+	resp.Result.Offset = ordersRequest.Offset
+	resp.Result.Limit = ordersRequest.Limit
+
 	err = json.Unmarshal(b, &resp)
 	if err != nil {
 		return nil, err

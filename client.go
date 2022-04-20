@@ -21,7 +21,7 @@ type APIClient struct {
 	apiSecret string
 }
 
-const API_URL = "https://api.p2pb2b.io"
+const API_URL = "https://api.p2pb2b.com"
 const API_KEY_HEADER = "X-TXC-APIKEY"
 const API_PAYLOAD_HEADER = "X-TXC-PAYLOAD"
 const API_SIGNATURE_HEADER = "X-TXC-SIGNATURE"
